@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Register = () => {
 
@@ -14,12 +15,21 @@ const Register = () => {
 
     const onChange = e => setFormData({...formData, [e.target.name]: e.target.value}); // using onChange for every field
 
-    const onSubmit = e =>{
+    const onSubmit = async e =>{
         e.preventDefault();
         if(password !== password2){
             console.log('Passwords do not match!');
         }else{
-            console.log(formData);
+            const new_user = {
+                name,
+                email,
+                password
+            };
+            try{
+                console.log('success');
+            }catch(err){
+                console.log(err.response.data);
+            }
         }
     }
 
