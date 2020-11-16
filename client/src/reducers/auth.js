@@ -5,7 +5,8 @@ import {
     AUTH_ERROR,
     LOGIN_SUCCESS,
     LOGIN_FAIL,
-    LOGOUT 
+    LOGOUT,
+    CLEAR_PROFILE 
 } 
 from '../actions/types';
 
@@ -82,7 +83,15 @@ export default function(state = initial_state, action){
                 token: null,
                 isAuthenticated: false,
                 loading: false
-            };     
+            }; 
+            
+        case CLEAR_PROFILE:
+             return {
+                 ...state,
+                 profile: null,
+                 repos: [],
+                 loading:false
+             }  
 
         default:
             return state;
