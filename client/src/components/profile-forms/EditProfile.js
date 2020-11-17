@@ -1,10 +1,10 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect} from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { createProfile } from '../../actions/profile';
+import { createProfile, getCurrentProfile } from '../../actions/profile';
 
-const CreateProfile = ({ createProfile, history }) => { // we are destructuring the history because it also come from the props object
+const EditProfile = ({ profile:{profile, loading}, createProfile, getCurrentProfile, history }) => { // we are destructuring the history because it also come from the props object
 
     const [formData, setFormData] = useState({
         company: '',
@@ -22,6 +22,26 @@ const CreateProfile = ({ createProfile, history }) => { // we are destructuring 
     });
 
     const [displaySocialInputs, toggleSocialMediaInputs] = useState(false);
+
+    // running this once: gets the profile and fills the already existing variable in case 
+    // this is why i prefer two way data binging (Vue.js) rather than React's one way data binding :)
+    useEffect(() =>{
+        getCurrentProfile();
+        setFormData({
+            company: loading || !profile.company ? '' : profile.company,
+            website: loading || !profile.website ? '' : profile.website,
+            location: loading || !profile.location ? '' : profile.location,
+            status: loading || !profile.status ? '' : profile.status,
+            skills: loading || !profile.skills ? '' : profile.skills,
+            githubusername: loading || !profile.githubusername ? '' : profile.githubusername,
+            bio: loading || !profile.bio ? '' : profile.bio,
+            twitter: loading || !profile.social ? '' : (profile.social.twitter ? profile.social.twitter : ''),
+            facebook: loading || !profile.social ? '' : (profile.social.facebook ? profile.social.facebook : ''),
+            linkedin: loading || !profile.social ? '' : (profile.social.linkedin ? profile.social.linkedin : ''),
+            youtube: loading || !profile.social ? '' : (profile.social.youtube ? profile.social.youtube : ''),
+            instagram: loading || !profile.social ? '' : (profile.social.instagram ? profile.social.instagram : '')
+        });
+    }, [loading]); // in this case, when it loads i want this to run only once
 
     const{
         company,
@@ -42,13 +62,13 @@ const CreateProfile = ({ createProfile, history }) => { // we are destructuring 
 
     const onSubmit = e => {
         e.preventDefault();
-        createProfile(formData, history, false);
+        createProfile(formData, history, true);
     }
 
     return (
         <Fragment>
             <h1 className="large text-primary">
-                Create Your Profile
+                Edit your profile
             </h1>
             <p className="lead">
                 <i className="fas fa-user"></i> Let's get some information to make your profile stand out
@@ -107,7 +127,7 @@ const CreateProfile = ({ createProfile, history }) => { // we are destructuring 
 
                 <div className="my-2">
                     <button onClick={() => toggleSocialMediaInputs(!displaySocialInputs)} type="button" className="btn btn-light">
-                        Add Social Network Links
+                        Edit Social Network Links
                     </button>
                     <span>Optional</span>
                 </div>
@@ -149,12 +169,18 @@ const CreateProfile = ({ createProfile, history }) => { // we are destructuring 
     )
 }
 
-CreateProfile.propTypes = {
-    createProfile: PropTypes.func.isRequired
+EditProfile.propTypes = {
+    createProfile: PropTypes.func.isRequired,
+    getCurrentProfile: PropTypes.func.isRequired,
+    profile: PropTypes.object.isRequired
 };
 
+const mapStateToProps = state => ({
+    profile: state.profile
+});
+
 export default connect(
-    null,
-    { createProfile }
-)(withRouter(CreateProfile)); 
+    mapStateToProps,
+    { createProfile, getCurrentProfile }
+)(withRouter(EditProfile)); 
 // if we are using the history we need to wrap the component with the withRouter method
