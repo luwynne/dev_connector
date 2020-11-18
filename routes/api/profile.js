@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
+const Post = require('../../models/Post');
 const { check, validationResult } = require('express-validator/check');
 const request = require('request');
 const config = require('config');
@@ -56,7 +57,7 @@ router.post('/',
             youtube,
             facebook,
             twitter,
-            intragram,
+            instagram,
             linkedin
         } = req.body;
 
@@ -68,7 +69,7 @@ router.post('/',
         if(location) profile_fields.location = location;
         
         profile_fields.status = status;
-        profile_fields.skills = skills.split(',').map(skill => skill.trim());
+        profile_fields.skills = skills;
         
         if(bio) profile_fields.bio = bio;
         if(githubusername) profile_fields.githubusername = githubusername;
@@ -78,7 +79,7 @@ router.post('/',
         if(youtube) profile_fields.social.youtube = youtube
         if(facebook) profile_fields.social.facebook = facebook
         if(twitter) profile_fields.social.twitter = twitter
-        if(intragram) profile_fields.social.intragram = intragram
+        if(instagram) profile_fields.social.instagram = instagram
         if(linkedin) profile_fields.social.linkedin = linkedin
 
         try{
@@ -142,10 +143,9 @@ router.get('/user/:user_id', async (req,res) => {
 // @access  Private
 router.delete('/', auth, async (req,res) => {
     try{
-        //remove user posts
-        
-        const profile = await Profile.findOneAndRemove({user: req.user.id}); // remove profile
-        const user = await User.findOneAndRemove({_id: req.user.id}); // remove user
+        await Post.deleteMany({user: req.user.id}); // removing the user's post
+        await Profile.findOneAndRemove({user: req.user.id}); // remove profile
+        await User.findOneAndRemove({_id: req.user.id}); // remove user
         res.json({msg:'User deleted.'});
     }catch(err){
         console.error(err.message);
