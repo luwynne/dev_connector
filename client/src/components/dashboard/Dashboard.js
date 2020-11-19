@@ -13,7 +13,7 @@ const Dashboard = ({ getCurrentProfile, auth:{user}, profile:{profile, loading},
     // making a constant request as soon as the component is built and only once
     useEffect(() =>{
         getCurrentProfile();
-    }, []);
+    }, [getCurrentProfile]);
 
     return loading && profile === null ? <Spinner/> : 
     <Fragment>
